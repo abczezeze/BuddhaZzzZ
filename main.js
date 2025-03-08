@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/GLTFLoader.js';
-import { UnrealBloomPass } from 'three/addons/UnrealBloomPass.js';
-import { EffectComposer } from 'three/addons/EffectComposer.js';
-import { RenderPass } from 'three/addons/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/shaders/UnrealBloomPass.js';
+import { EffectComposer } from 'three/addons/shaders/EffectComposer.js';
+import { RenderPass } from 'three/addons/shaders/RenderPass.js';
 
 // Set up scene, camera, renderer, light
 const scene = new THREE.Scene();
