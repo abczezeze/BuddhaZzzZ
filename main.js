@@ -44,7 +44,15 @@ buddha.children[1].traverse((child) => {
 buddha.children[1].position.y = 9;
 scene.add(buddha);
 //console.log(buddha);
-const LeoData = await loader.loadAsync('Models/Leo.glb');
+const LeoData = await loader.loadAsync('Models/Leo.glb',
+    (gltf) => {
+        scene.add(gltf.scene);
+        document.getElementById('loading').style.display = 'none'; // ซ่อน Loading
+    },
+    (xhr) => {
+        let percent = (xhr.loaded / xhr.total) * 100;
+        document.getElementById('loading').innerText = `Loading... ${percent.toFixed(2)}%`;
+    });
 const Leo = LeoData.scene;
 scene.add(Leo);
 const NagasData = await loader.loadAsync('Models/Nagas.glb');
