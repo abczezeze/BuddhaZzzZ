@@ -24,6 +24,23 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
+// Loading Manager
+const progressContainer = document.getElementById('progress-container');
+const progressBar = document.getElementById('progress-bar');
+const progressText = document.getElementById('progress-text');
+const manager = new THREE.LoadingManager();
+manager.onProgress = (url, itemsLoaded, itemsTotal) => {
+  const percentComplete = (itemsLoaded / itemsTotal) * 100;
+  progressBar.style.width = percentComplete + '%';
+  progressText.textContent = `Loading... ${Math.round(percentComplete)}%<br>
+  Item: ${url}`;
+};
+manager.onLoad = () => {
+  progressContainer.style.display = 'none'; // ซ่อนเมื่อโหลดเสร็จ
+};
+manager.onError = (url) => {
+  progressText.textContent = `Error loading: ${url}`;
+};
 
 const goldMaterial = new THREE.MeshStandardMaterial({
     color: 0xFFD700, // สีทอง
@@ -33,7 +50,7 @@ const goldMaterial = new THREE.MeshStandardMaterial({
     metalness: 1 // ทำให้เป็นวัสดุที่มีคุณสมบัติเหมือนโลหะ
 });
 // Load models
-const loader = new GLTFLoader();
+const loader = new GLTFLoader(manager);
 const buddhaData = await loader.loadAsync('Models/buddha.glb');
 const buddha = buddhaData.scene;
 buddha.children[1].traverse((child) => {
@@ -44,15 +61,7 @@ buddha.children[1].traverse((child) => {
 buddha.children[1].position.y = 9;
 scene.add(buddha);
 //console.log(buddha);
-const LeoData = await loader.loadAsync('Models/Leo.glb',
-    (gltf) => {
-        scene.add(gltf.scene);
-        document.getElementById('loading').style.display = 'none'; // ซ่อน Loading
-    },
-    (xhr) => {
-        let percent = (xhr.loaded / xhr.total) * 100;
-        document.getElementById('loading').innerText = `Loading... ${percent.toFixed(2)}%`;
-    });
+const LeoData = await loader.loadAsync('Models/Leo.glb');
 const Leo = LeoData.scene;
 scene.add(Leo);
 const NagasData = await loader.loadAsync('Models/Nagas.glb');
@@ -87,8 +96,8 @@ const info = document.createElement('div');
 info.style.position = 'absolute';
 info.style.top = '10px';
 info.style.left = '10px';
-info.style.color = 'white';
-info.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+info.style.color = 'black';
+//info.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
 info.style.padding = '10px';
 document.body.appendChild(info);
 
@@ -153,18 +162,15 @@ function moveToObject(position) {
 
 function animate() {
     requestAnimationFrame(animate);
+
     buddha.children[1].rotation.y += .03;
     buddha.children[1].position.y = 8 + Math.sin(Date.now() * .001) * 1;
 
     if (moving) {
         camera.position.lerp(targetPosition, 0.01);
-        if (camera.position.distanceTo(targetPosition) < 0.1) { 
-            moving = false;
-        }
+        if (camera.position.distanceTo(targetPosition) < 0.1) moving = false;
     }
     controls.update();
     composer.render();
 }
-
 animate();
-updateCameraInfo();

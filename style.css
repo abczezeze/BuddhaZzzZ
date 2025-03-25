@@ -1,1 +1,20 @@
-body { margin: 0; }
+#progress-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  text-align: center;
+  z-index: 10;
+}
+#progress-bar {
+  width: 0%;
+  height: 20px;
+  background-color: #4CAF50;
+  transition: width 0.3s;
+}
+#progress-text {
+  margin-top: 10px;
+  color: white;
+  font-family: Arial, sans-serif;
+}
