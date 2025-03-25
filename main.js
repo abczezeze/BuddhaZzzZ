@@ -32,8 +32,8 @@ let manager = new THREE.LoadingManager();
 manager.onProgress = (url, itemsLoaded, itemsTotal) => {
   const percentComplete = (itemsLoaded / itemsTotal) * 100;
   progressBar.style.width = percentComplete + '%';
-  progressText.textContent = `Loading... ${Math.round(percentComplete)}%<br>
-  Item: ${url}`;
+  progressText.textContent = `Loading... ${Math.round(percentComplete)}%\nItem: ${url}`;
+
 };
 manager.onLoad = () => {
   progressContainer.style.display = 'none'; // ซ่อนเมื่อโหลดเสร็จ
@@ -164,7 +164,7 @@ function moveToObject(position) {
 function animate() {
     requestAnimationFrame(animate);
 
-    buddha.children[1].rotation.y += .03;
+    buddha.children[1].rotation.y += .003;
     buddha.children[1].position.y = 8 + Math.sin(Date.now() * .001) * 1;
 
     if (moving) {
