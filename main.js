@@ -37,6 +37,7 @@ manager.onProgress = (url, itemsLoaded, itemsTotal) => {
 };
 manager.onLoad = () => {
   progressContainer.style.display = 'none'; // ซ่อนเมื่อโหลดเสร็จ
+  animate();
 };
 manager.onError = (url) => {
   progressText.textContent = `Error loading: ${url}`;
@@ -173,4 +174,3 @@ function animate() {
     controls.update();
     composer.render();
 }
-animate();
