@@ -28,7 +28,7 @@ document.body.appendChild(renderer.domElement);
 const progressContainer = document.getElementById('progress-container');
 const progressBar = document.getElementById('progress-bar');
 const progressText = document.getElementById('progress-text');
-const manager = new THREE.LoadingManager();
+let manager = new THREE.LoadingManager();
 manager.onProgress = (url, itemsLoaded, itemsTotal) => {
   const percentComplete = (itemsLoaded / itemsTotal) * 100;
   progressBar.style.width = percentComplete + '%';
