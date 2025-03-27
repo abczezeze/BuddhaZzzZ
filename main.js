@@ -1,9 +1,11 @@
 import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/OrbitControls.js';
-import { GLTFLoader } from 'three/addons/GLTFLoader.js';
-import { UnrealBloomPass } from 'three/addons/shaders/UnrealBloomPass.js';
-import { EffectComposer } from 'three/addons/shaders/EffectComposer.js';
-import { RenderPass } from 'three/addons/shaders/RenderPass.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+//import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 const targetPosition = new THREE.Vector3();
 let moving = false;
@@ -13,7 +15,8 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x99DDFF);
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.set(20,20,23);
+camera.position.set(0,5,19);
+//camera.rotation.set(-12,0,0);
 
 const light = new THREE.DirectionalLight(0xffffff, 1);
 light.position.set(200, 1000, 50);
@@ -22,6 +25,10 @@ scene.add(light);
 
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio( window.devicePixelRatio );
+renderer.setSize( window.innerWidth, window.innerHeight );
+renderer.setAnimationLoop( animate );
+renderer.toneMapping = THREE.ReinhardToneMapping;
 document.body.appendChild(renderer.domElement);
 
 // Loading Manager
@@ -119,11 +126,49 @@ composer.addPass(new RenderPass(scene, camera));
 
 const bloomPass = new UnrealBloomPass(
   new THREE.Vector2(window.innerWidth, window.innerHeight),  // Size
-  1.5,  // Strength
-  0.4,  // Radius
-  0.85  // Threshold
+  0.58,  // Strength
+  0,  // Radius
+  0,  // Threshold
 );
 composer.addPass(bloomPass);
+
+//gui
+const params = {
+    threshold: 0,
+    strength: 1,
+    radius: 0,
+    exposure: 1
+};
+
+const gui = new GUI();
+
+const bloomFolder = gui.addFolder( 'bloom' );
+
+bloomFolder.add( params, 'threshold', 0.0, 1.0 ).onChange( function ( value ) {
+
+    bloomPass.threshold = Number( value );
+
+} );
+
+bloomFolder.add( params, 'strength', 0.0, 3.0 ).onChange( function ( value ) {
+
+    bloomPass.strength = Number( value );
+
+} );
+
+gui.add( params, 'radius', 0.0, 1.0 ).step( 0.01 ).onChange( function ( value ) {
+
+    bloomPass.radius = Number( value );
+
+} );
+
+const toneMappingFolder = gui.addFolder( 'tone mapping' );
+
+toneMappingFolder.add( params, 'exposure', 0.1, 2 ).onChange( function ( value ) {
+
+    renderer.toneMappingExposure = Math.pow( value, 4.0 );
+
+} );
 
 // Resize handler
 window.addEventListener('resize', onWindowResize);
