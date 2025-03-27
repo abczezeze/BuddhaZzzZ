@@ -50,49 +50,60 @@ manager.onError = (url) => {
   progressText.textContent = `Error loading: ${url}`;
 };
 
-const goldMaterial = new THREE.MeshStandardMaterial({
-    color: 0xFFD700, // สีทอง
-    emissive: 0xFFAA00, // เพิ่มแสงเบาๆ เพื่อให้เกิด Bloom
-    emissiveIntensity: .5, // ความเข้มของแสงที่ออกมา
-    roughness: 0.5, // ความหยาบของพื้นผิว
-    metalness: 1 // ทำให้เป็นวัสดุที่มีคุณสมบัติเหมือนโลหะ
-});
 // Load models
+let buddha, leo, nagas, booth, pagoda, pavillion;
 const loader = new GLTFLoader(manager);
-const buddhaData = await loader.loadAsync('Models/buddha.glb');
-const buddha = buddhaData.scene;
-buddha.children[1].traverse((child) => {
+loader.load('Models/buddha.glb',function(gltf){
+    buddha = gltf.scene;
+    buddha.children[1].traverse((child) => {
     if (child.isMesh) {
-        child.material = goldMaterial;
+        child.material.emissive.setHex(0xFFAA00);
+        child.material.emissiveIntensity = 0.5;
     }
+    });
+    gsap.to(buddha.children[1].position, {
+        y: "+=2",
+        duration: 1,
+        ease: "sine.inOut",
+        repeat: -1,
+        yoyo: true
+      });
+      function rotateObject() {
+        requestAnimationFrame(rotateObject);
+        buddha.children[1].rotation.y += 0.02; 
+      }
+      rotateObject();
+    scene.add(buddha);
 });
-buddha.children[1].position.y = 9;
-scene.add(buddha);
-//console.log(buddha);
-const LeoData = await loader.loadAsync('Models/Leo.glb');
-const Leo = LeoData.scene;
-scene.add(Leo);
-const NagasData = await loader.loadAsync('Models/Nagas.glb');
-const Nagas = NagasData.scene;
-scene.add(Nagas);
-const floorWallData = await loader.loadAsync('Models/floorWall.glb');
-const floorWall = floorWallData.scene;
-scene.add(floorWall);
-const pagodaData = await loader.loadAsync('Models/pagoda.glb');
-const pagoda = pagodaData.scene;
-scene.add(pagoda);
-const boothData = await loader.loadAsync('Models/booth.glb');
-const booth = boothData.scene;
-scene.add(booth);
-const lobbyData = await loader.loadAsync('Models/lobby.glb');
-const lobby = lobbyData.scene;
-scene.add(lobby);
-const stairData = await loader.loadAsync('Models/stair.glb');
-const stair = stairData.scene;
-scene.add(stair);
-const pavillionData = await loader.loadAsync('Models/pavillion.glb');
-const pavillion = pavillionData.scene;
-scene.add(pavillion);
+loader.load('Models/Leo.glb',function(gltf){
+    leo = gltf.scene;
+    scene.add(leo);
+});
+loader.load('Models/Nagas.glb',function(gltf){
+    nagas = gltf.scene;
+    scene.add(nagas);
+});
+loader.load('Models/floorWall.glb',function(gltf){
+    scene.add(gltf.scene);
+});
+loader.load('Models/pagoda.glb',function(gltf){
+    pagoda = gltf.scene
+    scene.add(pagoda);
+});
+loader.load('Models/booth.glb',function(gltf){
+    booth = gltf.scene;
+    scene.add(booth);
+});
+loader.load('Models/lobby.glb',function(gltf){
+    scene.add(gltf.scene);
+});
+loader.load('Models/stair.glb',function(gltf){
+    scene.add(gltf.scene);
+});
+loader.load('Models/pavillion.glb',function(gltf){
+    pavillion = gltf.scene 
+    scene.add(pavillion);
+});
 
 // Set up OrbitControls
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -121,7 +132,7 @@ function updateCameraInfo() {
 controls.addEventListener('change', updateCameraInfo);
 
 // Set up Effect Composer for Bloom
-const composer = new EffectComposer(renderer);
+let composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
 
 const bloomPass = new UnrealBloomPass(
@@ -143,35 +154,35 @@ const params = {
 const gui = new GUI();
 
 const bloomFolder = gui.addFolder( 'bloom' );
-
 bloomFolder.add( params, 'threshold', 0.0, 1.0 ).onChange( function ( value ) {
-
     bloomPass.threshold = Number( value );
-
 } );
-
 bloomFolder.add( params, 'strength', 0.0, 3.0 ).onChange( function ( value ) {
-
     bloomPass.strength = Number( value );
-
 } );
-
 gui.add( params, 'radius', 0.0, 1.0 ).step( 0.01 ).onChange( function ( value ) {
-
     bloomPass.radius = Number( value );
-
 } );
-
 const toneMappingFolder = gui.addFolder( 'tone mapping' );
-
 toneMappingFolder.add( params, 'exposure', 0.1, 2 ).onChange( function ( value ) {
-
     renderer.toneMappingExposure = Math.pow( value, 4.0 );
-
 } );
 
 // Resize handler
 window.addEventListener('resize', onWindowResize);
+
+// แพนกล้องไปที่วัตถุ
+function panToObject(target) {
+    //console.log(target.position);
+    gsap.to(camera.position, {
+      x: target.position.x + 2,
+      y: target.position.y + 2,
+      z: target.position.z + 8,
+      duration: 2,
+      ease: "power2.inOut",
+      onUpdate: () => camera.lookAt(target.position)
+    });
+  }
 
 //Interactive
 const raycaster = new THREE.Raycaster();
@@ -186,9 +197,15 @@ window.addEventListener('click', (event) => {
     if (intersects.length > 0) {
         const ClickObj = intersects[0].object;
         console.log(ClickObj);
-        if(ClickObj.name==="BuddhaStatue") moveToObject(buddha.position);
-        if(ClickObj.name==="Pagoda") moveToObject(pagoda.position);
-        //if(ClickObj.name==="Pagoda") camera.position.set(-2,5,5);
+        if(ClickObj.name==="BuddhaStatue") panToObject(buddha.children[1]);
+        if(ClickObj.name==="Pagoda") panToObject(pagoda.children[0]);
+        if(ClickObj.name==="NagasStatueR") panToObject(nagas.children[1])
+        if(ClickObj.name==="NagasStatueL") panToObject(nagas.children[0]);
+        if(ClickObj.name==="pavillion") panToObject(pavillion.children[0]);
+        if(ClickObj.name==="StatueSinghR") panToObject(leo.children[1])
+        if(ClickObj.name==="StatueSinghL") panToObject(leo.children[0]);
+        if(ClickObj.name==="Booth") panToObject(booth.children[0]);
+
     }
 });
 
@@ -199,23 +216,12 @@ function onWindowResize() {
     composer.setSize(window.innerWidth, window.innerHeight);
 }
 
-function moveToObject(position) {
-    targetPosition.copy(position);
-    targetPosition.x += 15;
-    targetPosition.y += 15;
-    moving = true;
-}
-
 function animate() {
     requestAnimationFrame(animate);
 
-    buddha.children[1].rotation.y += .003;
-    buddha.children[1].position.y = 8 + Math.sin(Date.now() * .001) * 1;
+    // buddha.children[1].rotation.y += .003;
+    // buddha.children[1].position.y = 8 + Math.sin(Date.now() * .001) * 1;
 
-    if (moving) {
-        camera.position.lerp(targetPosition, 0.01);
-        if (camera.position.distanceTo(targetPosition) < 0.1) moving = false;
-    }
-    controls.update();
+    //controls.update();
     composer.render();
 }
