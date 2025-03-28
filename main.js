@@ -7,16 +7,12 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 //import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-const targetPosition = new THREE.Vector3();
-let moving = false;
-
 // Set up scene, camera, renderer, light
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x99DDFF);
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.set(0,5,19);
-//camera.rotation.set(-12,0,0);
+camera.position.set(0,33,22);
 
 const light = new THREE.DirectionalLight(0xffffff, 1);
 light.position.set(200, 1000, 50);
@@ -53,57 +49,62 @@ manager.onError = (url) => {
 // Load models
 let buddha, leo, nagas, booth, pagoda, pavillion;
 const loader = new GLTFLoader(manager);
-loader.load('Models/buddha.glb',function(gltf){
-    buddha = gltf.scene;
+const budaData = await loader.loadAsync('Models/buddha.glb');
+console.log(budaData);
+buddha = budaData.scene;
     buddha.children[1].traverse((child) => {
     if (child.isMesh) {
         child.material.emissive.setHex(0xFFAA00);
         child.material.emissiveIntensity = 0.5;
-    }
+        }
     });
-    gsap.to(buddha.children[1].position, {
-        y: "+=2",
-        duration: 1,
-        ease: "sine.inOut",
-        repeat: -1,
-        yoyo: true
-      });
-      function rotateObject() {
-        requestAnimationFrame(rotateObject);
-        buddha.children[1].rotation.y += 0.02; 
-      }
-      rotateObject();
-    scene.add(buddha);
-});
-loader.load('Models/Leo.glb',function(gltf){
-    leo = gltf.scene;
-    scene.add(leo);
-});
+gsap.to(buddha.children[1].position, {
+    y: "+=2",
+    duration: 1,
+    ease: "sine.inOut",
+    repeat: -1,
+    yoyo: true
+  });
+  function rotateObject() {
+    requestAnimationFrame(rotateObject);
+    buddha.children[1].rotation.y += 0.02; 
+  }
+  rotateObject();
+scene.add(buddha);
+
+const leoData = await loader.loadAsync('Models/Leo.glb');
+leo = leoData.scene;
+scene.add(leo);
+
 loader.load('Models/Nagas.glb',function(gltf){
     nagas = gltf.scene;
     scene.add(nagas);
 });
+
 loader.load('Models/floorWall.glb',function(gltf){
     scene.add(gltf.scene);
 });
+
 loader.load('Models/pagoda.glb',function(gltf){
     pagoda = gltf.scene
     scene.add(pagoda);
 });
-loader.load('Models/booth.glb',function(gltf){
-    booth = gltf.scene;
-    scene.add(booth);
-});
+
+const boothData = await loader.loadAsync('Models/booth.glb');
+booth = boothData.scene
+scene.add(booth);
+
 loader.load('Models/lobby.glb',function(gltf){
     scene.add(gltf.scene);
 });
+
 loader.load('Models/stair.glb',function(gltf){
     scene.add(gltf.scene);
 });
-loader.load('Models/pavillion.glb',function(gltf){
-    pavillion = gltf.scene 
-    scene.add(pavillion);
-});
+
+const pavillionData = await loader.loadAsync('Models/pavillion.glb');
+pavillion = pavillionData.scene
+scene.add(pavillion);
 
 // Set up OrbitControls
 const controls = new OrbitControls(camera, renderer.domElement);
