@@ -7,6 +7,8 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 //import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
+//declare sound
+let sfxWind, bgmNN;
 // Set up scene, camera, renderer, light
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x99DDFF);
@@ -144,8 +146,29 @@ const bloomPass = new UnrealBloomPass(
 );
 composer.addPass(bloomPass);
 
+//sound
+var listener = new THREE.AudioListener();
+bgmNN = new THREE.Audio( listener );
+var audioLoader = new THREE.AudioLoader();
+audioLoader.load('./sounds/NingNong.mp3', function( buffer ) {
+        bgmNN.setBuffer( buffer );
+        bgmNN.setLoop( true );
+        bgmNN.setVolume( 0.1 );
+        bgmNN.play();
+});
+
+sfxWind = new THREE.Audio( listener );
+audioLoader = new THREE.AudioLoader();
+audioLoader.load('./sounds/SoftWind.mp3', function( buffer ) {
+        sfxWind.setBuffer( buffer );
+        sfxWind.setLoop( false );
+        sfxWind.setVolume( 0.5 );
+});
+
 //gui
 const params = {
+    bgm: 0.1,
+    sfx: 0.5,
     threshold: 0,
     strength: 1,
     radius: 0,
@@ -153,7 +176,13 @@ const params = {
 };
 
 const gui = new GUI();
-
+const volumeFolder = gui.title('Sound');
+volumeFolder.add( params, 'bgm' ).min( 0.0 ).max( 1.0 ).step( 0.01 ).onChange( function () {
+    bgmNN.setVolume( params.bgm );
+} );
+volumeFolder.add( params, 'sfx' ).min( 0.0 ).max( 1.0 ).step( 0.01 ).onChange( function () {
+    sfxWind.setVolume( params.sfx );
+} );
 const bloomFolder = gui.addFolder( 'bloom' );
 bloomFolder.add( params, 'threshold', 0.0, 1.0 ).onChange( function ( value ) {
     bloomPass.threshold = Number( value );
@@ -183,6 +212,7 @@ function panToObject(target) {
       ease: "power2.inOut",
       onUpdate: () => camera.lookAt(target.position)
     });
+    sfxWind.play();
   }
 
 //Interactive
