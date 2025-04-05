@@ -150,7 +150,7 @@ composer.addPass(bloomPass);
 var listener = new THREE.AudioListener();
 bgmNN = new THREE.Audio( listener );
 var audioLoader = new THREE.AudioLoader();
-audioLoader.load('./sounds/NingNong.mp3', function( buffer ) {
+audioLoader.load('./sounds/BuddhaZzzZ.mp3', function( buffer ) {
         bgmNN.setBuffer( buffer );
         bgmNN.setLoop( true );
         bgmNN.setVolume( 0.1 );
@@ -162,13 +162,13 @@ audioLoader = new THREE.AudioLoader();
 audioLoader.load('./sounds/SoftWind.mp3', function( buffer ) {
         sfxWind.setBuffer( buffer );
         sfxWind.setLoop( false );
-        sfxWind.setVolume( 0.5 );
+        sfxWind.setVolume( 0.9 );
 });
 
 //gui
 const params = {
     bgm: 0.1,
-    sfx: 0.5,
+    sfx: 0.9,
     threshold: 0,
     strength: 1,
     radius: 0,
@@ -177,10 +177,10 @@ const params = {
 
 const gui = new GUI();
 const volumeFolder = gui.title('Sound');
-volumeFolder.add( params, 'bgm' ).min( 0.0 ).max( 1.0 ).step( 0.01 ).onChange( function () {
+volumeFolder.add( params, 'bgm' ).min( 0.0 ).max( 1.0 ).step( 0.1 ).onChange( function () {
     bgmNN.setVolume( params.bgm );
 } );
-volumeFolder.add( params, 'sfx' ).min( 0.0 ).max( 1.0 ).step( 0.01 ).onChange( function () {
+volumeFolder.add( params, 'sfx' ).min( 0.0 ).max( 1.0 ).step( 0.1 ).onChange( function () {
     sfxWind.setVolume( params.sfx );
 } );
 const bloomFolder = gui.addFolder( 'bloom' );
