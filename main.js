@@ -9,12 +9,14 @@ import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 //declare sound
 let sfxWind, bgmNN;
+
 // Set up scene, camera, renderer, light
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x99DDFF);
+scene.fog = new THREE.FogExp2( 0xaaccff, 0.0007 );
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.set(0,33,22);
+camera.position.set(0,20,50);
 
 const light = new THREE.DirectionalLight(0xffffff, 1);
 light.position.set(200, 1000, 50);
@@ -47,6 +49,64 @@ manager.onLoad = () => {
 manager.onError = (url) => {
   progressText.textContent = `Error loading: ${url}`;
 };
+
+let geometry = new THREE.PlaneGeometry( 200,610,4,8 );
+//geometry.rotateX( - Math.PI / 2 );
+
+const position = geometry.attributes.position;
+position.usage = THREE.DynamicDrawUsage;
+
+for ( let i = 0; i < position.count; i ++ ) {
+
+    const y = 35 * Math.sin( i / 2 );
+    position.setY( i, y );
+
+}
+
+const material = new THREE.ShaderMaterial({
+    uniforms: {
+        time: { value: 0.0 }
+    },
+    vertexShader: `
+        uniform float time;
+        varying vec3 vPosition;
+        void main() {
+            vec3 pos = position;
+            float t = mod(time, 62.83);
+            float wave = sin(pos.x / 5.0 + (t + pos.y) / 14.0);
+            pos.z = 333.0 * wave; // คงที่ที่ 35 เท่าเดิม
+            vPosition = pos;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+        }
+    `,
+    fragmentShader: `
+        uniform float time;
+        varying vec3 vPosition;
+        void main() {
+            float height = vPosition.z / 35.0;
+            float red = 0.6 + 0.2 * sin(height * 2.0 + time);
+            float green = 0.05 + 0.1 * sin(height + time + 1.0);
+            float blue = 0.02 * sin(height + time + 2.0);
+            float dist = length(vPosition.xy) / 50.0;
+            float flame = 0.5 * sin(dist * 10.0 + time * 3.0);
+            float flame2 = 0.3 * sin(dist * 15.0 + time * 4.0);
+            red += flame + flame2;
+            green += (flame + flame2) * 0.3;
+            vec3 color = vec3(
+                clamp(red * 0.8, 0.0, 1.0),
+                clamp(green * 0.6, 0.0, 1.0),
+                clamp(blue * 0.5, 0.0, 1.0)
+            );
+            gl_FragColor = vec4(color, 1.0);
+        }
+    `
+});
+
+let mesh = new THREE.Mesh( geometry, material );
+mesh.position.set(0,-35,-25);
+scene.add( mesh );
+
+let clock = new THREE.Clock();
 
 // Load models
 let buddha, leo, nagas, booth, pagoda, pavillion;
@@ -249,10 +309,8 @@ function onWindowResize() {
 
 function animate() {
     requestAnimationFrame(animate);
+    
+    mesh.material.uniforms.time.value = clock.getElapsedTime()* 0.2;
 
-    // buddha.children[1].rotation.y += .003;
-    // buddha.children[1].position.y = 8 + Math.sin(Date.now() * .001) * 1;
-
-    //controls.update();
     composer.render();
 }
