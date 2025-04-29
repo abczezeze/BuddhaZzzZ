@@ -1,0 +1,21 @@
+{
+  "name": "buddhazzzz-ts",
+  "version": "1.0.0",
+  "description": "BuddhaZzzZ project in TypeScript",
+  "main": "main.ts",
+  "scripts": {
+    "start": "vite",
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
+  },
+  "dependencies": {
+    "three": "^0.161.0",
+    "gsap": "^3.12.5"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "vite": "^5.1.0",
+    "@types/three": "^0.161.2"
+  }
+} 
