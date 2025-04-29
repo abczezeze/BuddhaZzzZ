@@ -124,7 +124,7 @@ const loader = new GLTFLoader(manager);
 // Load Buddha model
 const loadModels = async () => {
   try {
-    const budaData = await loader.loadAsync('Models/buddha.glb');
+    const budaData = await loader.loadAsync('/Models/buddha.glb');
     buddha = budaData.scene;
     buddha.children[1].traverse((child) => {
       if (child instanceof THREE.Mesh) {
@@ -149,38 +149,38 @@ const loadModels = async () => {
     scene.add(buddha);
 
     // Load other models
-    const leoData = await loader.loadAsync('Models/Leo.glb');
+    const leoData = await loader.loadAsync('/Models/Leo.glb');
     leo = leoData.scene;
     scene.add(leo);
 
-    const boothData = await loader.loadAsync('Models/booth.glb');
+    const boothData = await loader.loadAsync('/Models/booth.glb');
     booth = boothData.scene;
     scene.add(booth);
 
-    const pavillionData = await loader.loadAsync('Models/pavillion.glb');
+    const pavillionData = await loader.loadAsync('/Models/pavillion.glb');
     pavillion = pavillionData.scene;
     scene.add(pavillion);
 
     // Load remaining models
-    loader.load('Models/Nagas.glb', (gltf: GLTF) => {
+    loader.load('/Models/Nagas.glb', (gltf: GLTF) => {
       nagas = gltf.scene;
       scene.add(nagas);
     });
 
-    loader.load('Models/floorWall.glb', (gltf: GLTF) => {
+    loader.load('/Models/floorWall.glb', (gltf: GLTF) => {
       scene.add(gltf.scene);
     });
 
-    loader.load('Models/pagoda.glb', (gltf: GLTF) => {
+    loader.load('/Models/pagoda.glb', (gltf: GLTF) => {
       pagoda = gltf.scene;
       scene.add(pagoda);
     });
 
-    loader.load('Models/lobby.glb', (gltf: GLTF) => {
+    loader.load('/Models/lobby.glb', (gltf: GLTF) => {
       scene.add(gltf.scene);
     });
 
-    loader.load('Models/stair.glb', (gltf: GLTF) => {
+    loader.load('/Models/stair.glb', (gltf: GLTF) => {
       scene.add(gltf.scene);
     });
 
@@ -231,7 +231,7 @@ const listener = new THREE.AudioListener();
 bgmNN = new THREE.Audio(listener);
 const audioLoader = new THREE.AudioLoader();
 
-audioLoader.load('./sounds/BuddhaZzzZ.mp3', (buffer) => {
+audioLoader.load('/sounds/BuddhaZzzZ.mp3', (buffer) => {
   bgmNN.setBuffer(buffer);
   bgmNN.setLoop(true);
   bgmNN.setVolume(0.1);
@@ -239,7 +239,7 @@ audioLoader.load('./sounds/BuddhaZzzZ.mp3', (buffer) => {
 });
 
 sfxWind = new THREE.Audio(listener);
-audioLoader.load('./sounds/SoftWind.mp3', (buffer) => {
+audioLoader.load('/sounds/SoftWind.mp3', (buffer) => {
   sfxWind.setBuffer(buffer);
   sfxWind.setLoop(false);
   sfxWind.setVolume(0.9);
